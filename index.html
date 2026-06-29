@@ -1,1 +1,369 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Shield - Cidadania Digital & IA</title>
+    
+    <style>
+        /* Cores Temáticas Cyberpunk/Neon */
+        :root {
+            --bg-principal: #090d16;
+            --bg-card: #111827;
+            --purple-neon: #a855f7;
+            --cyan-neon: #06b6d4;
+            --pink-neon: #f43f5e;
+            --green-neon: #10b981;
+            --texto: #e2e8f0;
+        }
 
+        /* Reset Geral */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-principal);
+            color: var(--texto);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 20px 10px 20px;
+            width: 100%;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            color: var(--purple-neon);
+            text-shadow: 0 0 15px var(--purple-neon);
+            margin-bottom: 8px;
+            font-weight: 800;
+        }
+
+        header p {
+            color: var(--cyan-neon);
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .instructions {
+            text-align: center;
+            max-width: 650px;
+            margin: 10px auto 20px auto;
+            padding: 0 20px;
+        }
+
+        .instructions h2 {
+            color: var(--pink-neon);
+            margin-bottom: 8px;
+            font-size: 1.4rem;
+        }
+
+        /* Painel de Controle (Placar e Botões) */
+        .control-panel {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            width: 90%;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .score-box {
+            font-size: 1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .score-box span {
+            color: var(--cyan-neon);
+            font-size: 1.2rem;
+        }
+
+        .btn-reset {
+            background-color: transparent;
+            color: var(--pink-neon);
+            border: 2px solid var(--pink-neon);
+            padding: 8px 18px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 5px rgba(244, 63, 94, 0.2);
+        }
+
+        .btn-reset:hover {
+            background-color: var(--pink-neon);
+            color: var(--bg-principal);
+            box-shadow: 0 0 15px var(--pink-neon);
+            transform: scale(1.05);
+        }
+
+        /* Container do Jogo */
+        .game-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            padding: 10px;
+            flex-grow: 1;
+        }
+
+        .game-board {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            max-width: 900px;
+            justify-content: center;
+            align-content: center;
+        }
+
+        /* Cartas Estilizadas */
+        .card {
+            width: 140px;
+            height: 140px;
+            background-color: var(--bg-card);
+            border: 2px solid var(--cyan-neon);
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            line-height: 1.3;
+            user-select: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: transform 0.2s ease, border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: var(--purple-neon);
+            box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);
+        }
+
+        /* Estado: Carta Virada */
+        .card.flipped {
+            background-color: #1e293b;
+            border-color: var(--purple-neon);
+            color: var(--purple-neon);
+            box-shadow: 0 0 15px var(--purple-neon);
+            transform: scale(1.02);
+        }
+
+        /* Estado: Par Encontrado */
+        .card.matched {
+            background-color: #064e3b;
+            border-color: var(--green-neon);
+            color: #a7f3d0;
+            box-shadow: 0 0 15px var(--green-neon);
+            cursor: default;
+            transform: none;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            width: 100%;
+            font-size: 0.85rem;
+            color: rgba(226, 232, 240, 0.6);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-top: 30px;
+        }
+
+        footer strong {
+            color: var(--cyan-neon);
+        }
+
+        /* Responsividade para Celulares */
+        @media (max-width: 600px) {
+            header h1 { font-size: 1.8rem; }
+            .control-panel { flex-direction: column; gap: 10px; text-align: center; }
+            .card {
+                width: 105px;
+                height: 105px;
+                font-size: 0.7rem;
+                padding: 6px;
+            }
+            .game-board { gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Cyber Shield IA</h1>
+        <p>Cidadania Digital & Combate à Desinformação</p>
+    </header>
+
+    <main style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+        <section class="instructions">
+            <h2>Desafio de Verificação</h2>
+            <p>Treine seu olhar crítico! Conecte as <strong>Ameaças Virtuais</strong> feitas por IA com as melhores <strong>Estratégias de Defesa</strong>.</p>
+        </section>
+
+        <section class="control-panel">
+            <div class="score-box">Tentativas: <span id="movesCount">0</span></div>
+            <div class="score-box">Acertos: <span id="matchesCount">0/6</span></div>
+            <button class="btn-reset" id="resetBtn">Reiniciar Matrix</button>
+        </section>
+
+        <section class="game-container">
+            <div class="game-board" id="gameBoard"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Desenvolvido para a Recuperação Prática de Educação Digital e IA &copy; 2026</p>
+        <p>Tag de Rastreamento Oficial do Repositório: <strong>#cidadaniadigital2026</strong></p>
+    </footer>
+
+    <script>
+        // Banco de dados expandido com 6 pares (12 cartas no total)
+        const gameItems = [
+            { id: 1, text: "Deepfake de Vídeo" },
+            { id: 1, text: "Geração de rostos e falas falsas altamente realistas." },
+            
+            { id: 2, text: "Ataque Phishing" },
+            { id: 2, text: "E-mails falsos gerados por IA para roubar dados de acesso." },
+            
+            { id: 3, text: "Robôs de Desinformação" },
+            { id: 3, text: "Perfis falsos criados para espalhar mentiras em massa." },
+            
+            { id: 4, text: "Falta de Fontes" },
+            { id: 4, text: "O principal sinal de alerta em notícias duvidosas." },
+            
+            { id: 5, text: "Checagem de Fatos" },
+            { id: 5, text: "Consultar portais de verificação antes de repassar." },
+            
+            { id: 6, text: "Privacidade Digital" },
+            { id: 6, text: "Proteger seus dados para evitar o treino de IAs maliciosas." }
+        ];
+
+        let cardA = null;
+        let cardB = null;
+        let preventClick = false;
+        let moves = 0;
+        let matches = 0;
+
+        const board = document.getElementById('gameBoard');
+        const movesDisplay = document.getElementById('movesCount');
+        const matchesDisplay = document.getElementById('matchesCount');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // Embaralhar
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        // Construir o jogo
+        function initGame() {
+            board.innerHTML = ""; // Limpa o tabuleiro
+            cardA = null;
+            cardB = null;
+            preventClick = false;
+            moves = 0;
+            matches = 0;
+            movesDisplay.textContent = moves;
+            matchesDisplay.textContent = `0/${gameItems.length / 2}`;
+
+            const mixedItems = shuffle([...gameItems]);
+
+            mixedItems.forEach(item => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.dataset.id = item.id;
+                card.dataset.text = item.text;
+                card.textContent = "⚙️ CORRUPTO"; // Texto misterioso inicial
+                
+                card.addEventListener('click', handleCardClick);
+                board.appendChild(card);
+            });
+        }
+
+        // Gerenciar Cliques
+        function handleCardClick() {
+            if (preventClick) return;
+            if (this === cardA) return;
+            if (this.classList.contains('matched')) return;
+
+            this.classList.add('flipped');
+            this.textContent = this.dataset.text; // Revela o conteúdo interno
+
+            if (!cardA) {
+                cardA = this;
+                return;
+            }
+
+            cardB = this;
+            moves++;
+            movesDisplay.textContent = moves;
+            
+            evaluateMatch();
+        }
+
+        // Avaliar Par
+        function evaluateMatch() {
+            const isMatch = cardA.dataset.id === cardB.dataset.id;
+
+            if (isMatch) {
+                cardA.classList.add('matched');
+                cardB.classList.add('matched');
+                matches++;
+                matchesDisplay.textContent = `${matches}/${gameItems.length / 2}`;
+                
+                clearTurn();
+                checkVictory();
+            } else {
+                preventClick = true;
+                setTimeout(() => {
+                    cardA.classList.remove('flipped');
+                    cardB.classList.remove('flipped');
+                    cardA.textContent = "⚙️ CORRUPTO";
+                    cardB.textContent = "⚙️ CORRUPTO";
+                    clearTurn();
+                }, 1400); // Tempo otimizado para leitura
+            }
+        }
+
+        function clearTurn() {
+            [cardA, cardB] = [null, null];
+            preventClick = false;
+        }
+
+        // Alerta de Vitória Otimizado
+        function checkVictory() {
+            if (matches === gameItems.length / 2) {
+                setTimeout(() => {
+                    alert(`⚡ SISTEMA PROTEGIDO! ⚡\nVocê concluiu o teste de cidadania digital com ${moves} tentativas.`);
+                }, 400);
+            }
+        }
+
+        // Listener do botão reiniciar
+        resetBtn.addEventListener('click', initGame);
+
+        // Inicialização automática ao abrir o site
+        initGame();
+    </script>
+</body>
+</html>
